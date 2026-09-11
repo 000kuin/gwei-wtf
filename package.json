@@ -1,5 +1,8 @@
 {
-  "name": "rhgas",
+  "name": "gwei-wtf",
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild", "@vitejs/plugin-react"]
+  },
   "version": "0.0.1",
   "private": true,
   "type": "module",
