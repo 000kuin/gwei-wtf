@@ -1,7 +1,9 @@
-import React from "react";
-import { IconTrendingUp, IconZap, IconGlobe, IconLayers, IconBarChart, IconShield, IconExternalLink } from "../components/Icons.tsx";
+import React, { useState } from "react";
+import { IconTrendingUp, IconZap, IconGlobe, IconLayers, IconBarChart, IconShield, IconExternalLink, IconCopy, IconCheck } from "../components/Icons.tsx";
 
 const PONS_URL = "https://pons.finance"; // update with actual Pons listing URL
+const GWEI_CA  = "0x7879d7114beb5edc9c81a6ba32a179519be567a4";
+const EXPLORER = `https://robinhoodchain.blockscout.com/token/${GWEI_CA}`;
 
 export function TokenPage() {
   return (
@@ -87,6 +89,9 @@ export function TokenPage() {
               <div style={{ fontWeight: 700, fontSize: 14, color: "var(--text)" }}>Pons · Robinhood Chain</div>
             </div>
           </div>
+
+          {/* Contract address */}
+          <CACard />
 
           {/* CTAs */}
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -208,6 +213,7 @@ export function TokenPage() {
               { k: "Trading hours", v: "24/7 — chain never stops" },
               { k: "Launch",        v: "Fair launch on Pons" },
               { k: "Utility",       v: "gwei.wtf tracker, bid board, oracle API" },
+              { k: "Contract",      v: `${GWEI_CA.slice(0,8)}…${GWEI_CA.slice(-6)}` },
             ]}
           />
           <div style={{ textAlign: "center", fontFamily: "var(--mono)", fontSize: 20, fontWeight: 700, color: "var(--text-3)" }}>/</div>
@@ -239,18 +245,41 @@ export function TokenPage() {
           No presale. No team allocation. No vesting cliffs. Launched on Pons with a bonding curve.
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 32 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 16 }}>
           {[
-            { label: "Ticker",  value: "$GWEI" },
-            { label: "Chain",   value: "Robinhood Chain" },
-            { label: "Launch",  value: "Pons fair launch" },
-            { label: "Pair",    value: "$GWEI / USO" },
+            { label: "Ticker",   value: "$GWEI" },
+            { label: "Chain",    value: "Robinhood Chain" },
+            { label: "Launch",   value: "Pons fair launch" },
+            { label: "Pair",     value: "$GWEI / USO" },
           ].map(({ label, value }) => (
             <div key={label} style={{ padding: "20px", background: "var(--glass)", border: "1px solid var(--border)", borderRadius: "var(--r-lg)", textAlign: "center" }}>
               <div style={{ fontSize: 10, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 10 }}>{label}</div>
               <div style={{ fontFamily: "var(--mono)", fontSize: 20, fontWeight: 800, color: "var(--low)" }}>{value}</div>
             </div>
           ))}
+        </div>
+
+        {/* Contract address row */}
+        <div style={{
+          marginBottom: 16,
+          padding: "14px 20px",
+          background: "var(--glass)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--r-lg)",
+          display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12,
+        }}>
+          <div>
+            <div style={{ fontSize: 10, color: "var(--text-3)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Contract address · Robinhood Chain</div>
+            <a
+              href={EXPLORER}
+              target="_blank" rel="noopener noreferrer"
+              style={{ fontFamily: "var(--mono)", fontSize: 14, fontWeight: 600, color: "var(--low)", display: "flex", alignItems: "center", gap: 6 }}
+            >
+              {GWEI_CA}
+              <IconExternalLink size={12} color="var(--low)" />
+            </a>
+          </div>
+          <CopyCAButton />
         </div>
 
         <div style={{
@@ -300,6 +329,79 @@ export function TokenPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+function CACard() {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard.writeText(GWEI_CA);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <div style={{
+      display: "inline-flex", alignItems: "center", gap: 12,
+      padding: "10px 20px",
+      background: "var(--glass)",
+      border: "1px solid var(--border-2)",
+      borderRadius: "var(--r-lg)",
+      marginBottom: 32,
+      backdropFilter: "blur(12px)",
+    }}>
+      <div>
+        <div style={{ fontSize: 9, color: "var(--text-3)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 3 }}>Contract address</div>
+        <a
+          href={EXPLORER}
+          target="_blank" rel="noopener noreferrer"
+          style={{ fontFamily: "var(--mono)", fontSize: 13, fontWeight: 600, color: "var(--low)", display: "flex", alignItems: "center", gap: 5 }}
+        >
+          {GWEI_CA.slice(0, 10)}…{GWEI_CA.slice(-8)}
+          <IconExternalLink size={11} color="var(--low)" />
+        </a>
+      </div>
+      <button
+        onClick={copy}
+        style={{
+          display: "flex", alignItems: "center", gap: 4,
+          padding: "5px 12px", borderRadius: "var(--r-sm)",
+          border: `1px solid ${copied ? "var(--low-border)" : "var(--border-2)"}`,
+          background: copied ? "var(--low-dim)" : "transparent",
+          color: copied ? "var(--low)" : "var(--text-3)",
+          fontSize: 11, fontFamily: "var(--mono)", cursor: "pointer",
+          transition: "all 0.15s",
+        }}
+      >
+        {copied ? <IconCheck size={11} color="var(--low)" /> : <IconCopy size={11} color="currentColor" />}
+        {copied ? "Copied" : "Copy CA"}
+      </button>
+    </div>
+  );
+}
+
+function CopyCAButton() {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard.writeText(GWEI_CA);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button
+      onClick={copy}
+      style={{
+        display: "flex", alignItems: "center", gap: 5,
+        padding: "8px 14px", borderRadius: "var(--r-sm)",
+        border: `1px solid ${copied ? "var(--low-border)" : "var(--border-2)"}`,
+        background: copied ? "var(--low-dim)" : "var(--glass)",
+        color: copied ? "var(--low)" : "var(--text-2)",
+        fontSize: 12, fontFamily: "var(--mono)", cursor: "pointer", whiteSpace: "nowrap",
+        transition: "all 0.15s", flexShrink: 0,
+      }}
+    >
+      {copied ? <IconCheck size={12} color="var(--low)" /> : <IconCopy size={12} color="currentColor" />}
+      {copied ? "Copied!" : "Copy CA"}
+    </button>
   );
 }
 
